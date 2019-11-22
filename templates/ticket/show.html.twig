@@ -1,0 +1,81 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Ticket{% endblock %}
+
+{% block body %}
+{{ include('base.html.twig') }}
+    <h1>Ticket</h1>
+   
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ ticket.id }}</td>
+            </tr>
+            <tr>
+                <th>Title</th>
+                <td>{{ ticket.title }}</td>
+            </tr>
+            <tr>
+                <th>Content</th>
+                <td>{{ ticket.content }}</td>
+            </tr>
+            <tr>
+                <th>Priority</th>
+                <td>{{ ticket.priority }}</td>
+            </tr>
+            
+            <tr>
+                <th>Custom</th>
+                <td>{{ ticket.custom }}</td>
+            </tr>
+            <tr>
+                <th>Start</th>
+                <td>{{ ticket.start ? ticket.start|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('ticket_index') }}">back to list</a>
+
+    
+    {% if is_granted('ROLE_ADMIN') %}
+               <a href="{{ path('ticket_edit', {'id': ticket.id}) }}">edit</a>
+                {{ include('ticket/_delete_form.html.twig') }}
+    {% endif %}
+     
+    <hr>
+        <table class="table table-hover">
+            <thead class="thead-dark">
+                <tr>
+                    <th>les Message</th>
+
+                    <th>actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for message in messages %}
+                    <tr class="bg-secondary">
+                        <td>{{ message.message }}</td>
+                        <td>
+                            <a href="{{ path('messages_show', {'id': message.id}) }}">show</a>
+                            
+                        </td>
+                        {% if is_granted('ROLE_ADMIN') %}
+                    
+                        <td><a href="{{ path('messages_edit', {'id': message.id}) }}">edit</a></td>
+                        <td>  {{ include('messages/_delete_form.html.twig') }}</td>
+                        {% endif %}
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="4">pas de message</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    <br>
+     {{ include('./messages/_form.html.twig') }}
+
+{% endblock %}
+

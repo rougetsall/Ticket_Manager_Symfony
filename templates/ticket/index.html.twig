@@ -1,0 +1,54 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Ticket index{% endblock %}
+
+{% block body %}
+    {{ include('base.html.twig') }}
+    <h1>Ticket index</h1>
+
+    <table class="table table-hover">
+        <thead class="thead-dark ">
+            <tr>
+                <th>Id</th>
+                <th>Title</th>
+                <th>Content</th>
+                <th>Priority</th>
+                
+                <th>Custom</th>
+                <th>Start</th>
+                <th>actions</th>
+                
+            </tr>
+        </thead>
+       
+
+        <tbody>
+        {% for ticket in tickets %}
+            <tr class="bg-secondary">
+                <td>{{ ticket.id }}</td>
+                <td>{{ ticket.title }}</td>
+                <td>{{ ticket.content }}</td>
+                <td>{{ ticket.priority }}</td>
+                <td>{{ ticket.custom }}</td>
+                <td>{{ ticket.start ? ticket.start|date('Y-m-d H:i:s') : '' }}</td>
+                <td>
+                    <a href="{{ path('ticket_show', {'id': ticket.id}) }}">messages</a>
+                    
+                </td>
+                
+                 {% if is_granted('ROLE_ADMIN') %}
+                
+                 <td><a href="{{ path('ticket_edit', {'id': ticket.id}) }}">edit</a></td>
+                <td> {{ include('ticket/_delete_form.html.twig') }}</td>
+                 {% endif %}
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="8">Pas de ticke</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('ticket_new') }}">Create new</a>
+{% endblock %}

@@ -1,0 +1,178 @@
+<?php
+     
+namespace App\Controller;
+use DateTime;
+use App\Entity\Ticket;
+use App\Entity\User;
+use App\Form\TicketType;
+use App\Repository\TicketRepository;
+use App\Entity\Messages;
+use App\Form\MessagesType;
+use App\Repository\MessagesRepository;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\Security\Core\Security;
+// $session = new Session();
+// $session->start();
+$session = new Session();
+
+//var_dump(get("users"));
+/**
+ * @Route("/ticket")
+ */
+class TicketController extends AbstractController
+{
+    
+   
+   
+    /**
+     * @Route("/", name="ticket_index", methods={"GET"})
+     */
+    public function index(TicketRepository $ticketRepository,Security $security): Response
+    {  
+          
+
+        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
+            return $this->redirectToRoute('app_login');
+          }
+        else{
+                if($security->getUser()->getRoles()[0]=='ROLE_ADMIN')
+                {
+                    return $this->render('ticket/index.html.twig', [
+                        'tickets' => $ticketRepository->findAll()
+                        
+                    ]);
+                }
+                else{
+                    
+                    return $this->render('ticket/index.html.twig', [
+                        'tickets' => $ticketRepository->findBy(
+                            ["auth"=>$security->getUser()->getId()],
+                            ['start' => 'DESC'])
+                        
+                    ]);
+                }
+            
+
+        }
+      
+    
+    }
+
+    /**
+     * @Route("/new", name="ticket_new", methods={"GET","POST"})
+     */
+    public function new(Request $request,Security $security): Response
+    {
+        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
+            return $this->redirectToRoute('app_login');
+          }
+        else{
+
+        
+        $ticket = new Ticket();
+        $form = $this->createForm(TicketType::class, $ticket);
+        $form->handleRequest($request);
+        $ticket->setUser($security->getUser());
+        $ticket->setAuth($security->getUser()->getId());
+        $ticket->setStart(new DateTime());
+        
+        if ($form->isSubmitted() && $form->isValid()) {
+            $entityManager = $this->getDoctrine()->getManager();
+            $entityManager->persist($ticket);
+            $entityManager->flush();
+
+            return $this->redirectToRoute('ticket_index');
+        }
+
+        return $this->render('ticket/new.html.twig', [
+            'ticket' => $ticket,
+            'form' => $form->createView(),
+        ]);
+       }
+    }
+
+    /**
+     * @Route("/{id}", name="ticket_show", methods={"GET","POST"})
+     */
+    public function show(Ticket $ticket,Request $request,Security $security,MessagesRepository $messagesRepository): Response
+    {  
+        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
+           return $this->redirectToRoute('app_login');
+        }
+        else{
+           
+            
+            $message = new Messages();
+            $form = $this->createForm(MessagesType::class, $message);
+            $form->handleRequest($request);
+            $message->setUserId($security->getUser());
+            $message->setStartmessage(new DateTime());
+            $message->setTicketmessage($ticket->getId());
+        
+
+            if ($form->isSubmitted() && $form->isValid()) {
+                $entityManager = $this->getDoctrine()->getManager();
+                $entityManager->persist($message);
+                $entityManager->flush();
+
+                return $this->redirectToRoute('ticket_show', ['id' => $ticket->getId()]);
+            }
+            return $this->render('ticket/show.html.twig', [
+                'ticket' => $ticket,
+                'message' => $message,
+                'messages' => $messagesRepository->findBy(
+                 ["ticketmessage"=>$ticket->getId()],
+                 ['startmessage' => 'ASC']
+                ),
+                'form' => $form->createView(),
+            ]);
+
+            
+        }
+        
+    }
+
+    /**
+     * @Route("/{id}/edit", name="ticket_edit", methods={"GET","POST"})
+     */
+    public function edit(Request $request, Ticket $ticket): Response
+    {
+        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
+            return $this->redirectToRoute('app_login');
+         }
+         else{
+            $form = $this->createForm(TicketType::class, $ticket);
+            $form->handleRequest($request);
+    
+            if ($form->isSubmitted() && $form->isValid()) {
+                $this->getDoctrine()->getManager()->flush();
+    
+                return $this->redirectToRoute('ticket_index');
+            }
+    
+            return $this->render('ticket/edit.html.twig', [
+                'ticket' => $ticket,
+                'form' => $form->createView(),
+            ]);
+         }
+       
+    }
+
+    /**
+     * @Route("/{id}", name="ticket_delete", methods={"DELETE"})
+     */
+    public function delete(Request $request, Ticket $ticket): Response
+    {
+        if ($this->isCsrfTokenValid('delete'.$ticket->getId(), $request->request->get('_token'))) {
+            $entityManager = $this->getDoctrine()->getManager();
+            $entityManager->remove($ticket);
+            $entityManager->flush();
+        }
+
+        return $this->redirectToRoute('ticket_index');
+    }
+}
