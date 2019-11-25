@@ -8,5 +8,32 @@
 
     {{ include('ticket/_form.html.twig') }}
 
-    <a href="{{ path('ticket_index') }}">back to list</a>
+   <table>
+     <tr>
+     <td> <a href="{{ path('ticket_index') }}">back to list</a>
+        </td>
+     <td>  
+         {% if is_granted('ROLE_ADMIN') %}
+            
+                  <div class="input-group mb-3" style="margin-top:-55px ; margin-left:50%;">
+                     <div class="input-group-prepend">
+                        <label class="input-group-text" for="inputGroupSelect01">Assigne</label>
+                     </div>
+                     <select class="custom-select" id="inputGroupSelect01" name="getAssigne">
+                        <option selected value='0'>Choose User</option>
+                        {% for user in users %}
+                         {% set foo = user.id %}
+                         <option  value='{{ user.id }}'><h3>{{ user.id }} -> {{ user.email }}</h3></option>
+         
+                        {% endfor %}
+                     </select>
+                    
+                  </div>   
+            
+        {% endif %}
+        </td>
+   
+     </tr>
+   </table>
+   {{ form_end(form) }}
 {% endblock %}

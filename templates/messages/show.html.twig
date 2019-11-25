@@ -22,7 +22,7 @@
         </tbody>
     </table>
 
-    <a href="{{ path('messages_index') }}">back to list</a>
+    <a href="{{ path('ticket_index') }}">back to list</a>
         {% if is_granted('ROLE_ADMIN') %}
         
             <a href="{{ path('messages_edit', {'id': message.id}) }}">edit</a>

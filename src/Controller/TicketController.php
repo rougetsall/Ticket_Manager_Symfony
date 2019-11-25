@@ -15,6 +15,8 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Security\Core\Security;
+use App\Repository\UserRepository;
+use Symfony\Component\HttpFoundation\ParameterBag;
 // $session = new Session();
 // $session->start();
 $session = new Session();
@@ -23,18 +25,17 @@ $session = new Session();
 /**
  * @Route("/ticket")
  */
+
 class TicketController extends AbstractController
 {
     
-   
+    
    
     /**
      * @Route("/", name="ticket_index", methods={"GET"})
      */
     public function index(TicketRepository $ticketRepository,Security $security): Response
     {  
-          
-
         if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
             return $this->redirectToRoute('app_login');
           }
@@ -65,7 +66,7 @@ class TicketController extends AbstractController
     /**
      * @Route("/new", name="ticket_new", methods={"GET","POST"})
      */
-    public function new(Request $request,Security $security): Response
+    public function new(Request $request,Security $security,UserRepository $userRepository): Response
     {
         if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
             return $this->redirectToRoute('app_login');
@@ -74,13 +75,26 @@ class TicketController extends AbstractController
 
         
         $ticket = new Ticket();
+        
         $form = $this->createForm(TicketType::class, $ticket);
         $form->handleRequest($request);
         $ticket->setUser($security->getUser());
-        $ticket->setAuth($security->getUser()->getId());
+      
         $ticket->setStart(new DateTime());
         
         if ($form->isSubmitted() && $form->isValid()) {
+            $request = Request::createFromGlobals();
+            $request = new Request(
+                $_GET,
+                $_POST
+            );
+            if($request->request->get("getAssigne")!=null && $request->request->get("getAssigne")!=0){
+                $ticket->setAuth($request->request->get("getAssigne"));
+            }else{
+                $ticket->setAuth($security->getUser()->getId());
+            }
+         
+            //var_dump($request->request->get("getAssigne"));
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->persist($ticket);
             $entityManager->flush();
@@ -90,6 +104,7 @@ class TicketController extends AbstractController
 
         return $this->render('ticket/new.html.twig', [
             'ticket' => $ticket,
+            'users'=>$userRepository->findAll(),
             'form' => $form->createView(),
         ]);
        }

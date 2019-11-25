@@ -4,7 +4,7 @@
 
 {% block body %}
     {{ include('base.html.twig') }}
-    <h1>Ticket index</h1>
+    <h1>les Tickets</h1>
 
     <table class="table table-hover">
         <thead class="thead-dark ">
@@ -16,7 +16,14 @@
                 
                 <th>Custom</th>
                 <th>Start</th>
+                {% if is_granted('ROLE_ADMIN') %}
+                <th></th>
                 <th>actions</th>
+                 <th></th>
+                {% else %}
+                 <th>actions</th>
+                
+                {% endif %}
                 
             </tr>
         </thead>
