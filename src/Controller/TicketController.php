@@ -36,10 +36,7 @@ class TicketController extends AbstractController
      */
     public function index(TicketRepository $ticketRepository,Security $security): Response
     {  
-        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
-            return $this->redirectToRoute('app_login');
-          }
-        else{
+      
                 if($security->getUser()->getRoles()[0]=='ROLE_ADMIN')
                 {
                     return $this->render('ticket/index.html.twig', [
@@ -58,7 +55,7 @@ class TicketController extends AbstractController
                 }
             
 
-        }
+        
       
     
     }
@@ -68,12 +65,7 @@ class TicketController extends AbstractController
      */
     public function new(Request $request,Security $security,UserRepository $userRepository): Response
     {
-        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
-            return $this->redirectToRoute('app_login');
-          }
-        else{
-
-        
+      
         $ticket = new Ticket();
         
         $form = $this->createForm(TicketType::class, $ticket);
@@ -107,7 +99,7 @@ class TicketController extends AbstractController
             'users'=>$userRepository->findAll(),
             'form' => $form->createView(),
         ]);
-       }
+       
     }
 
     /**
@@ -115,11 +107,7 @@ class TicketController extends AbstractController
      */
     public function show(Ticket $ticket,Request $request,Security $security,MessagesRepository $messagesRepository): Response
     {  
-        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
-           return $this->redirectToRoute('app_login');
-        }
-        else{
-           
+        
             
             $message = new Messages();
             $form = $this->createForm(MessagesType::class, $message);
@@ -147,7 +135,6 @@ class TicketController extends AbstractController
             ]);
 
             
-        }
         
     }
 
@@ -156,10 +143,7 @@ class TicketController extends AbstractController
      */
     public function edit(Request $request, Ticket $ticket): Response
     {
-        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
-            return $this->redirectToRoute('app_login');
-         }
-         else{
+        
             $form = $this->createForm(TicketType::class, $ticket);
             $form->handleRequest($request);
     
@@ -173,8 +157,7 @@ class TicketController extends AbstractController
                 'ticket' => $ticket,
                 'form' => $form->createView(),
             ]);
-         }
-       
+         
     }
 
     /**

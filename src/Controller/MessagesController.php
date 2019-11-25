@@ -17,20 +17,17 @@ use Symfony\Component\Security\Core\Security;
  */
 class MessagesController extends AbstractController
 {
-    /**
-     * @Route("/", name="messages_index", methods={"GET"})
-     */
-    public function index(MessagesRepository $messagesRepository): Response
-    { 
-        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
-            return $this->redirectToRoute('app_login');
-          }
-        else{
-            return $this->render('messages/index.html.twig', [
-                'messages' => $messagesRepository->findAll(),
-            ]);
-        }
-    }
+    // /**
+    //  * @Route("/", name="messages_index", methods={"GET"})
+    //  */
+    // public function index(MessagesRepository $messagesRepository): Response
+    // { 
+        
+    //         return $this->render('messages/index.html.twig', [
+    //             'messages' => $messagesRepository->findAll(),
+    //         ]);
+        
+    // }
 
     /**
      * @Route("/new", name="messages_new", methods={"GET","POST"})
@@ -67,14 +64,11 @@ class MessagesController extends AbstractController
      */
     public function show(Messages $message): Response
     { 
-        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
-            return $this->redirectToRoute('app_login');
-          }
-        else{
+        
             return $this->render('messages/show.html.twig', [
                 'message' => $message,
             ]);
-            }
+            
     }
 
     /**
@@ -82,10 +76,7 @@ class MessagesController extends AbstractController
      */
     public function edit(Request $request, Messages $message): Response
     {
-        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
-            return $this->redirectToRoute('app_login');
-          }
-        else{
+        
             $form = $this->createForm(MessagesType::class, $message);
             $form->handleRequest($request);
 
@@ -99,7 +90,7 @@ class MessagesController extends AbstractController
                 'message' => $message,
                 'form' => $form->createView(),
             ]);
-        }
+        
     }
 
     /**

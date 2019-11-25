@@ -49,10 +49,15 @@
             <thead class="thead-dark">
                 <tr>
                     <th>les Message</th>
+                   
+                    
+                   {% if is_granted('ROLE_ADMIN') %}
                     <th></th>
                     <th>actions</th>
                     <th></th>
-                    
+                   {% else %}
+                   <th>actions</th>
+                   {% endif %}
 
                 </tr>
             </thead>
