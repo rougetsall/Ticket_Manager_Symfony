@@ -68,7 +68,7 @@ class MessagesController extends AbstractController
     public function show(Messages $message): Response
     { 
         if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
-            return $this->redirectToRoute('login');
+            return $this->redirectToRoute('app_login');
           }
         else{
             return $this->render('messages/show.html.twig', [
@@ -83,7 +83,7 @@ class MessagesController extends AbstractController
     public function edit(Request $request, Messages $message): Response
     {
         if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
-            return $this->redirectToRoute('login');
+            return $this->redirectToRoute('app_login');
           }
         else{
             $form = $this->createForm(MessagesType::class, $message);
