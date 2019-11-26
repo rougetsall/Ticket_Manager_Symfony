@@ -8,6 +8,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response; 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use App\Repository\UserRepository;
+use Symfony\Component\Security\Core\Security;
 
 
 class AdminController extends AbstractController
@@ -43,12 +44,25 @@ class AdminController extends AbstractController
     /**
      * @Route("/admin",name="admin")
      */
-    public function admin(UserRepository $listUsers)
-    {
-
-        return $this->render('admin/index.html.twig', [
-            'users' => $listUsers->findAll(),
-        ]);
+    public function admin(UserRepository $listUsers,Security $security)
+    {  
+        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
+                  return $this->redirectToRoute('app_login');
+                }
+        else{
+        
+            if($security->getUser()->getRoles()[0]=='ROLE_ADMIN')
+            {
+                return $this->render('admin/index.html.twig', [
+                    'users' => $listUsers->findAll(),
+                ]);
+            }
+            else{
+                echo "<script type='text/javascript'>alert('vous etez pas administrateur');</script>";
+                return $this->redirectToRoute('index');
+            
+            }
+        }
         
     }
 }
