@@ -34,10 +34,10 @@ class TicketController extends AbstractController
     /**
      * @Route("/", name="ticket_index", methods={"GET"})
      */
-    public function index(TicketRepository $ticketRepository,Security $security): Response
+    public function index(TicketRepository $ticketRepository): Response
     {  
       
-                if($security->getUser()->getRoles()[0]=='ROLE_ADMIN')
+                if(in_array('ROLE_ADMIN', $this->getUser()->getRoles()))
                 {
                     return $this->render('ticket/index.html.twig', [
                         'tickets' => $ticketRepository->findAll()
@@ -48,7 +48,7 @@ class TicketController extends AbstractController
                     
                     return $this->render('ticket/index.html.twig', [
                         'tickets' => $ticketRepository->findBy(
-                            ["auth"=>$security->getUser()->getId()],
+                            ["auth"=>$this->getUser()->getId()],
                             ['start' => 'DESC'])
                         
                     ]);
@@ -86,7 +86,7 @@ class TicketController extends AbstractController
                 $ticket->setAuth($security->getUser()->getId());
             }
          
-            //var_dump($request->request->get("getAssigne"));
+            // var_dump($request->request->get("getAssignes"));
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->persist($ticket);
             $entityManager->flush();

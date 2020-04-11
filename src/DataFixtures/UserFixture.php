@@ -18,13 +18,12 @@ class UserFixture extends BaseFixture
     protected function loadData(ObjectManager $manager)
     {
         $user = new User();
-        $user->setEmail('admin@gmail.com');
+        $user->setEmail('rougetAdmin@gmail.com');
 
-        $password = $this->encoder->encodePassword($user, 'pass_1234');
+        $password = $this->encoder->encodePassword($user, 'Kussum03');
         $user->setPassword($password);
         $user->setRoles(['ROLE_ADMIN']);
         $manager->persist($user);
-        $manager->flush();
-     
+        $manager->flush();   
     }
 }
